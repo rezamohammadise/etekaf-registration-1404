@@ -1,82 +1,50 @@
 'use client';
 
+import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { CheckCircle, Download, Printer, Share2 } from 'lucide-react';
-import { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-export default function SuccessPage() {
+// محتوای اصلی صفحه
+function SuccessContent() {
   const searchParams = useSearchParams();
-  const trackingCode = searchParams.get('trackingCode');
-  const refId = searchParams.get('refId');
+  const trackingCode = searchParams?.get('trackingCode') || null;
+  const refId = searchParams?.get('refId') || null;
   const [printContent, setPrintContent] = useState('');
+  const [isPrinting, setIsPrinting] = useState(false);
 
   useEffect(() => {
-    if (trackingCode && refId) {
-      const content = `
-        <div style="font-family: Vazirmatn, sans-serif; text-align: right; padding: 20px; direction: rtl;">
-          <h2 style="color: #10b981; margin-bottom: 20px;">رسید پرداخت موفق</h2>
-          <div style="border: 1px solid #e5e7eb; padding: 20px; border-radius: 8px;">
-            <p><strong>کد رهگیری:</strong> ${trackingCode}</p>
-            <p><strong>شماره پیگیری:</strong> ${refId}</p>
-            <p><strong>تاریخ:</strong> ${new Date().toLocaleDateString('fa-IR')}</p>
-            <p><strong>وضعیت:</strong> پرداخت موفق</p>
-            <p style="margin-top: 20px; color: #6b7280;">
-              این رسید را برای حضور در مراسم اعتکاف همراه داشته باشید.
-            </p>
-          </div>
+    if (trackingCode) {
+      setPrintContent(`
+        <div dir="rtl">
+          <h1>رسید پرداخت موفق</h1>
+          <p>کد رهگیری: ${trackingCode}</p>
+          <p>شماره پیگیری: ${refId || '---'}</p>
+          <p>تاریخ: ${new Date().toLocaleDateString('fa-IR')}</p>
         </div>
-      `;
-      setPrintContent(content);
+      `);
     }
   }, [trackingCode, refId]);
 
   const handlePrint = () => {
-    const printWindow = window.open('', '_blank');
-    if (printWindow) {
-      printWindow.document.write(`
-        <html>
-          <head>
-            <title>رسید پرداخت اعتکاف ۱۴۰۴</title>
-            <style>
-              @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;700&display=swap');
-              body { font-family: Vazirmatn, sans-serif; }
-            </style>
-          </head>
-          <body>
-            ${printContent}
-            <script>
-              window.onload = function() {
-                window.print();
-                window.onafterprint = function() {
-                  window.close();
-                };
-              }
-            </script>
-          </body>
-        </html>
-      `);
-      printWindow.document.close();
-    }
+    setIsPrinting(true);
+    setTimeout(() => {
+      window.print();
+      setIsPrinting(false);
+    }, 500);
   };
 
   const handleShare = async () => {
     if (navigator.share) {
       try {
         await navigator.share({
-          title: 'رسید پرداخت اعتکاف ۱۴۰۴',
-          text: `ثبت‌نام اعتکاف ۱۴۰۴ با موفقیت انجام شد. کد رهگیری: ${trackingCode}`,
+          title: 'رسید پرداخت اعتکاف',
+          text: `کد رهگیری من: ${trackingCode}`,
           url: window.location.href,
         });
-      } catch (error) {
-        console.log('Error sharing:', error);
+      } catch (err) {
+        console.log('خطا در اشتراک‌گذاری:', err);
       }
-    } else {
-      // Fallback for browsers that don't support Web Share API
-      navigator.clipboard.writeText(
-        `ثبت‌نام اعتکاف ۱۴۰۴ با موفقیت انجام شد. کد رهگیری: ${trackingCode}`
-      );
-      alert('متن کپی شد');
     }
   };
 
@@ -175,5 +143,14 @@ export default function SuccessPage() {
         </div>
       </div>
     </div>
+  );
+}
+
+// صفحه اصلی با Suspense
+export default function SuccessPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">در حال بارگذاری...</div>}>
+      <SuccessContent />
+    </Suspense>
   );
 }

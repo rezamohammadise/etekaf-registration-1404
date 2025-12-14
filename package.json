@@ -1,4 +1,7 @@
 {
+  "name": "etekaf-registration-1404",
+  "version": "0.1.0",
+  "private": true,
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -6,8 +9,27 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "next": "latest",
-    "react": "latest",
-    "react-dom": "latest"
+    "@fontsource/inter": "^5.2.8",
+    "@hookform/resolvers": "^3.3.2",
+    "autoprefixer": "^10.4.16",
+    "axios": "^1.6.2",
+    "date-fns-tz": "^3.2.0",
+    "lucide-react": "^0.309.0",
+    "mongoose": "^8.0.3",
+    "next": "^14.2.35",
+    "postcss": "^8.4.32",
+    "react": "^18.2.0",
+    "react-datepicker": "^9.0.0",
+    "react-dom": "^18.2.0",
+    "react-hook-form": "^7.48.2",
+    "react-toastify": "^10.0.4",
+    "tailwindcss": "^3.4.0",
+    "zod": "^3.22.4"
+  },
+  "devDependencies": {
+    "@types/node": "^20.10.5",
+    "@types/react": "^18.2.45",
+    "@types/react-dom": "^18.2.18",
+    "typescript": "^5.3.3"
   }
 }

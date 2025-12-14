@@ -7,6 +7,10 @@ module.exports = {
   ],
   theme: {
     extend: {
+      boxShadow: {
+        'card': '0 4px 12px rgba(0, 0, 0, 0.08)',
+        'card-hover': '0 8px 24px rgba(0, 0, 0, 0.12)',
+      },
       colors: {
         primary: {
           50: '#eff6ff',
@@ -15,10 +19,11 @@ module.exports = {
           300: '#93c5fd',
           400: '#60a5fa',
           500: '#3b82f6',
-          600: '#2563eb',
+          600: '#2563eb',  // این همان bg-primary-600 است
           700: '#1d4ed8',
           800: '#1e40af',
           900: '#1e3a8a',
+          950: '#172554',
         },
         secondary: {
           50: '#f8fafc',
@@ -31,14 +36,11 @@ module.exports = {
           700: '#334155',
           800: '#1e293b',
           900: '#0f172a',
-        },
+          950: '#020617',
+        }
       },
       fontFamily: {
-        sans: ['Vazirmatn', 'system-ui', '-apple-system', 'sans-serif'],
-      },
-      boxShadow: {
-        'card': '0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06)',
-        'card-hover': '0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05)',
+        sans: ['var(--font-inter)'],
       },
     },
   },

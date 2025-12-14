@@ -1,18 +1,20 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter } from 'next/font/google';
+
+const inter = Inter({ 
+  subsets: ['latin'],
+  display: 'swap',
+  preload: false,
+  fallback: ['system-ui', 'arial']
+});
 import './globals.css'
 import Header from '@/components/Header'
 import Footer from '@/components/Footer'
 import { ToastContainer } from 'react-toastify'
 
-const inter = Inter({ subsets: ['latin'] })
-
 export const metadata: Metadata = {
   title: 'ثبت‌نام اعتکاف ۱۴۰۴',
-  description: 'سیستم ثبت‌نام آنلاین اعتکاف سال ۱۴۰۴',
-  keywords: ['اعتکاف', 'ثبت‌نام اعتکاف', 'اعتکاف 1404', 'مسجد'],
-  authors: [{ name: 'Etekaaf Team' }],
-  robots: 'index, follow',
+  description: 'سیستم ثبت‌نام و پرداخت اینترنتی اعتکاف',
 }
 
 export default function RootLayout({
@@ -22,25 +24,15 @@ export default function RootLayout({
 }) {
   return (
     <html lang="fa" dir="rtl">
-      <body className={`${inter.className} min-h-screen flex flex-col`}>
+      <body className={`${inter.className} bg-gray-50`}>
         <Header />
-        <main className="flex-grow">
+        <main className="min-h-screen">
           {children}
         </main>
         <Footer />
-        <ToastContainer
-          position="top-left"
-          autoClose={5000}
-          hideProgressBar={false}
-          newestOnTop={false}
-          closeOnClick
-          rtl={true}
-          pauseOnFocusLoss
-          draggable
-          pauseOnHover
-          theme="light"
-        />
+        <ToastContainer rtl position="top-center" />
       </body>
     </html>
   )
 }
+

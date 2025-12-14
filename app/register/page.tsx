@@ -25,7 +25,7 @@ const registrationSchema = z.object({
   foodType: z.enum(['vegetarian', 'normal', 'special']),
 });
 
-type RegistrationFormData = z.infer<typeof registrationSchema>;
+export type RegistrationFormData = z.infer<typeof registrationSchema>;
 
 export default function RegisterPage() {
   const router = useRouter();

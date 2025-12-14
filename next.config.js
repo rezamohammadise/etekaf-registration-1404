@@ -1,13 +1,11 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  swcMinify: true,
+  swcMinify: false, // یا حذف این خط
   experimental: {
-    serverComponentsExternalPackages: ['mongoose'],
-  },
-  compiler: {
-    removeConsole: process.env.NODE_ENV === 'production',
-  },
+    // تنظیمات experimental
+  }
 }
 
 module.exports = nextConfig
+
