@@ -16,31 +16,32 @@ interface RegistrationFormProps {
   isSubmitting: boolean;
 }
 
-const cities = [
-  'تهران',
-  'مشهد',
-  'اصفهان',
-  'شیراز',
-  'تبریز',
-  'قم',
-  'اهواز',
-  'کرج',
-  'کرمانشاه',
-  'ارومیه',
+// فقط استان اصفهان
+const provinces = [
+  { id: 1, name: 'اصفهان' }
 ];
 
-const mosquesByCity = {
-  'تهران': ['مسجد امام حسین (ع)', 'مسجد جامع تهران', 'مسجد الغدیر', 'مسجد النبی'],
-  'مشهد': ['مسجد امام رضا (ع)', 'مسجد گوهرشاد', 'مسجد جامع مشهد'],
-  'اصفهان': ['مسجد امام اصفهان', 'مسجد شیخ لطف‌الله', 'مسجد جامع اصفهان'],
-  'شیراز': ['مسجد وکیل', 'مسجد جامع عتیق', 'مسجد نصیرالملک'],
-  'تبریز': ['مسجد کبود', 'مسجد جامع تبریز'],
-  'قم': ['مسجد جمکران', 'مسجد امام حسن عسکری (ع)'],
-  'اهواز': ['مسجد سید الشهدا', 'مسجد جامع اهواز'],
-  'کرج': ['مسجد جامع کرج', 'مسجد امام رضا (ع)'],
-  'کرمانشاه': ['مسجد جامع کرمانشاه', 'مسجد امیرالمؤمنین'],
-  'ارومیه': ['مسجد جامع ارومیه', 'مسجد سید الشهدا'],
+// فقط شهرستان سمیرم
+const citiesByProvince: { [key: number]: { id: number; name: string }[] } = {
+  1: [ // اصفهان
+    { id: 101, name: 'سمیرم' }
+  ]
 };
+
+// فقط مساجد سمیرم
+const mosquesByCity: { [key: number]: string[] } = {
+  101: [ // سمیرم
+    'مسجد فاطمه زهرا (س) - شهرک آبشار'
+  ]
+};
+
+// گزینه‌های غذا
+const foodOptions = [
+  'جوجه کباب',
+  'چلو کباب', 
+  'چلو خورشت قیمه',
+  'چلو خورشت سبزی'
+];
 
 export default function RegistrationForm({
   register,
@@ -51,19 +52,17 @@ export default function RegistrationForm({
   isSubmitting,
 }: RegistrationFormProps) {
   const [selectedDate, setSelectedDate] = useState<Date | null>(null);
-  const [availableMosques, setAvailableMosques] = useState<string[]>([]);
-  
+  const [availableMosques, setAvailableMosques] = useState<string[]>(mosquesByCity[101]);
+
   const selectedCity = watch('city');
   const selectedMosque = watch('mosque');
 
+  // مقدار پیش‌فرض برای استان و شهر
   useEffect(() => {
-    if (selectedCity && mosquesByCity[selectedCity as keyof typeof mosquesByCity]) {
-      setAvailableMosques(mosquesByCity[selectedCity as keyof typeof mosquesByCity]);
-      if (!selectedMosque) {
-        setValue('mosque', mosquesByCity[selectedCity as keyof typeof mosquesByCity][0]);
-      }
-    }
-  }, [selectedCity, selectedMosque, setValue]);
+    setValue('province', 'اصفهان');
+    setValue('city', 'سمیرم');
+    setValue('mosque', 'مسجد فاطمه زهرا (س) - شهرک آبشار');
+  }, [setValue]);
 
   const handleDateChange = (date: Date | null) => {
     setSelectedDate(date);
@@ -148,26 +147,15 @@ export default function RegistrationForm({
         {/* جنسیت */}
         <div>
           <label className="label">جنسیت</label>
-          <div className="flex gap-4">
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="male"
-                className="ml-2"
-                {...register('gender')}
-              />
-              <span>مرد</span>
-            </label>
-            <label className="flex items-center">
-              <input
-                type="radio"
-                value="female"
-                className="ml-2"
-                {...register('gender')}
-              />
-              <span>زن</span>
-            </label>
-          </div>
+          <select
+            className="input-field"
+            {...register('gender')}
+            defaultValue=""
+          >
+            <option value="" disabled>انتخاب کنید</option>
+            <option value="male">مرد</option>
+            <option value="female">زن</option>
+          </select>
           {errors.gender && (
             <p className="mt-1 text-sm text-red-600">{errors.gender.message}</p>
           )}
@@ -183,9 +171,8 @@ export default function RegistrationForm({
             selected={selectedDate}
             onChange={handleDateChange}
             dateFormat="yyyy/MM/dd"
-            maxDate={new Date()}
-            placeholderText="انتخاب تاریخ تولد"
-            className="input-field"
+            placeholderText="۱۳۷۰/۰۱/۰۱"
+            className="input-field w-full"
             showYearDropdown
             yearDropdownItemNumber={50}
             scrollableYearDropdown
@@ -194,118 +181,108 @@ export default function RegistrationForm({
             <p className="mt-1 text-sm text-red-600">{errors.birthDate.message}</p>
           )}
         </div>
-      </div>
 
-      {/* اطلاعات محل */}
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-        {/* شهر */}
+        {/* استان (غیرقابل تغییر) */}
         <div>
           <label className="label">
             <MapPin className="inline w-4 h-4 ml-1" />
-            شهر
+            استان
           </label>
-          <select
-            className="input-field"
-            {...register('city')}
-          >
-            {cities.map((city) => (
-              <option key={city} value={city}>
-                {city}
-              </option>
-            ))}
-          </select>
-          {errors.city && (
-            <p className="mt-1 text-sm text-red-600">{errors.city.message}</p>
-          )}
+          <div className="bg-gray-100 p-3 rounded-lg border border-gray-300">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-gray-800">اصفهان</span>
+              <span className="text-green-600">✔</span>
+            </div>
+          </div>
+          <input type="hidden" {...register('province')} value="اصفهان" />
         </div>
 
-        {/* مسجد */}
+        {/* شهرستان (غیرقابل تغییر) */}
+        <div>
+          <label className="label">شهرستان</label>
+          <div className="bg-gray-100 p-3 rounded-lg border border-gray-300">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-gray-800">سمیرم</span>
+              <span className="text-green-600">✔</span>
+            </div>
+          </div>
+          <input type="hidden" {...register('city')} value="سمیرم" />
+        </div>
+
+        {/* مسجد (غیرقابل تغییر) */}
         <div>
           <label className="label">مسجد</label>
-          <select
-            className="input-field"
-            {...register('mosque')}
+          <div className="bg-gray-100 p-3 rounded-lg border border-gray-300">
+            <div className="flex justify-between items-center">
+              <span className="font-bold text-gray-800">مسجد فاطمه زهرا (س) - شهرک آبشار</span>
+              <span className="text-green-600">✔</span>
+            </div>
+          </div>
+          <input type="hidden" {...register('mosque')} value="مسجد فاطمه زهرا (س) - شهرک آبشار" />
+        </div>
+
+        {/* اطلاعات غذا (اطلاعیه) */}
+        <div className="col-span-1 md:col-span-2">
+          <label className="label">
+            <Utensils className="inline w-4 h-4 ml-1" />
+            غذای روز اعتکاف
+          </label>
+          <div className="bg-amber-50 border border-amber-200 rounded-lg p-4">
+            <p className="font-bold text-amber-800 mb-2">انواع غذای سرو شده در اعتکاف سمیرم:</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+              {foodOptions.map((food, index) => (
+                <div key={index} className="bg-white border border-amber-300 rounded p-2 text-center">
+                  <div className="flex items-center justify-center">
+                    <span className="text-amber-700 font-medium">{food}</span>
+                  </div>
+                </div>
+              ))}
+            </div>
+            <p className="text-sm text-amber-600 mt-2">
+              نوع غذا در روز اعتکاف به شرکت‌کنندگان اعلام خواهد شد.
+            </p>
+          </div>
+        </div>
+
+        {/* مبلغ پرداخت */}
+        <div className="col-span-1 md:col-span-2">
+          <div className="bg-blue-50 border-2 border-blue-300 rounded-xl p-4">
+            <div className="flex flex-col md:flex-row justify-between items-center">
+              <div>
+                <h4 className="font-bold text-blue-800">مبلغ قابل پرداخت</h4>
+                <p className="text-sm text-blue-600">هزینه ثبت‌نام اعتکاف سمیرم</p>
+              </div>
+              <div className="text-center md:text-right mt-2 md:mt-0">
+                <div className="text-3xl font-bold text-blue-700">۶۵۰,۰۰۰</div>
+                <div className="text-lg text-blue-600">تومان</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* دکمه ثبت‌نام */}
+        <div className="col-span-1 md:col-span-2">
+          <button
+            type="submit"
+            disabled={isSubmitting}
+            className="btn-primary w-full py-4 text-lg font-bold"
           >
-            {availableMosques.map((mosque) => (
-              <option key={mosque} value={mosque}>
-                {mosque}
-              </option>
-            ))}
-          </select>
-          {errors.mosque && (
-            <p className="mt-1 text-sm text-red-600">{errors.mosque.message}</p>
-          )}
+            {isSubmitting ? (
+              <span className="flex items-center justify-center">
+                <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                  <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                  <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                در حال پردازش...
+              </span>
+            ) : (
+              'ثبت‌نام و پرداخت ۶۵۰,۰۰۰ تومان'
+            )}
+          </button>
+          <p className="text-sm text-gray-500 mt-2 text-center">
+            با کلیک بر روی دکمه بالا به درگاه پرداخت بانکی هدایت خواهید شد.
+          </p>
         </div>
-      </div>
-
-      {/* نوع غذا */}
-      <div>
-        <label className="label">
-          <Utensils className="inline w-4 h-4 ml-1" />
-          نوع غذا
-        </label>
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <label className="card cursor-pointer hover:border-primary-500 transition-colors">
-            <input
-              type="radio"
-              value="normal"
-              className="ml-2"
-              {...register('foodType')}
-            />
-            <div className="mt-2">
-              <div className="font-bold">غذای معمولی</div>
-              <div className="text-sm text-gray-600">غذای متداول اعتکاف</div>
-            </div>
-          </label>
-          <label className="card cursor-pointer hover:border-primary-500 transition-colors">
-            <input
-              type="radio"
-              value="vegetarian"
-              className="ml-2"
-              {...register('foodType')}
-            />
-            <div className="mt-2">
-              <div className="font-bold">گیاهخواری</div>
-              <div className="text-sm text-gray-600">بدون گوشت قرمز و مرغ</div>
-            </div>
-          </label>
-          <label className="card cursor-pointer hover:border-primary-500 transition-colors">
-            <input
-              type="radio"
-              value="special"
-              className="ml-2"
-              {...register('foodType')}
-            />
-            <div className="mt-2">
-              <div className="font-bold">غذای ویژه</div>
-              <div className="text-sm text-gray-600">برای افراد با شرایط خاص</div>
-            </div>
-          </label>
-        </div>
-        {errors.foodType && (
-          <p className="mt-1 text-sm text-red-600">{errors.foodType.message}</p>
-        )}
-      </div>
-
-      {/* دکمه ثبت‌نام */}
-      <div className="pt-6 border-t border-gray-200">
-        <button
-          type="submit"
-          disabled={isSubmitting}
-          className="w-full btn-primary text-lg py-4"
-        >
-          {isSubmitting ? (
-            <span className="flex items-center justify-center">
-              <svg className="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              در حال پردازش...
-            </span>
-          ) : (
-            'ادامه و پرداخت'
-          )}
-        </button>
       </div>
     </form>
   );
